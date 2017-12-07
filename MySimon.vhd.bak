@@ -1,0 +1,277 @@
+library iee;
+Use IEEE.STD_LOGIC_1164.ALL;
+Use IEEE.STD_LOGIC_ARITH.ALL;
+Use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity MySimon is
+	port ( b1,b2,b3,b4 : in std_logic;
+			led1,led2,led3,led4, led5 : out std_logic;
+			lose : out std_logic;
+			clck: in std_logic;
+			fl : out std_logic;
+			success : out std_logic;
+			)
+	end MySimon;
+architecture behavior of MySimon is
+	type state_type is(lit0,lit1,lit2,lit3,s0,s1,s2,s3,waitt,pass,fail,start);
+	signal state: state_type;
+	signal clk_1hz : std_logic;
+	signal rst : std_logic := '1';
+	signal counter : std_logic_vector(32 downto 0);
+	signal debcounter : std_logic_vector(32 downto 0);
+
+
+	begin
+		
+		counter: process(clk)
+	begin
+	
+		
+		
+			if clk'event and clk = '1'then
+			
+				if rst = '0' and counter < "1100000100011110011110100000000" then
+				
+					counter <= counter + 1;
+					
+				else 
+					counter <= "000000000000000000000000000000";
+				end if;
+			end if;
+		
+	end process counter;
+	
+	debcounter: process(clk)
+	begin
+	
+		
+		
+			if clk'event and clk = '1'then
+			
+				if debrst = '0' and debcounter < "1100110111111110011000000" then
+				
+					debcounter <= debcounter + 1;
+					
+				
+				end if;
+			end if;
+		
+	end process debcounter;
+	
+	
+	
+	
+	simon: process(clk)
+		begin
+		if(enable = '0') then
+			state <= waitt;
+		
+		elsif (clk'event and clk = '1') then
+			case state is
+				when start =>
+					start = '1';
+					fail = '0';
+				
+				when lit0 =>
+					rst <= '0';
+					led5 = '0';
+					if counter = "1000000010111110111111000000000" then
+					led1 = '1';
+					led2 = '0';
+					led3 = '0';
+					led4 = '0';
+					
+					
+					rst <= '1';
+					state <= s0;
+					end if;
+				when s0 =>
+					rst <= '0';
+					
+					led1 <= '0';
+					led2 <= '0';
+					led3 <= '0';
+					led4 <= '0';
+					led5 <= '1';
+					
+					if  counter < "10000000101111101111110000000000" then -- 2 sec
+						if debcounter = "1100110111111110011000000"  then -- .25 sec
+							if b1 = '0' then
+								state <= lit1;
+								debcounter <= (others => '0');
+							end if;
+						else 
+							debcounter <= (others => '0');
+						end if;
+					else
+						state <= fail;
+					end if;
+				when lit1 =>
+					rst <= '0';
+					led5 = '0';
+					if counter = "1000000010111110111111000000000" then
+					led1 = '1';
+					led2 = '0';
+					led3 = '0';
+					led4 = '0';
+					end if;
+					if counter = "1001101001111110110010000000" then
+					led1 = '0';
+					led2 = '0';
+					led3 = '1';
+					led4 = '0';
+					end if;
+					
+					rst <= '1';
+					state <= s1;
+					end if;
+				when s1
+					rst <= '0';
+					
+					led1 <= '0';
+					led2 <= '0';
+					led3 <= '0';
+					led4 <= '0';
+					led5 <= '1';
+					
+					if  counter < "100000001011111011111100000000000" then -- 4 sec
+						if debcounter = "1100110111111110011000000"  then -- .25 sec
+							if b1 = '0' then
+								
+								debcounter <= (others => '0');
+							end if;
+							if b3 = '0' then
+							state <= lit2;
+								debcounter <= (others => '0');
+						else 
+							debcounter <= (others => '0');
+						end if;
+					else
+						state <= fail;
+					end if;
+				when lit2
+					rst <= '0';
+					led5 = '0';
+					if counter = "1000000010111110111111000000000" then --1 sec
+					led1 = '0';
+					led2 = '0';
+					led3 = '1';
+					led4 = '0';
+					end if;
+					if counter = "1001101001111110110010000000" then -- 1.5 sec
+					led1 = '0';
+					led2 = '1';
+					led3 = '0';
+					led4 = '0';
+					end if;
+					if counter = "1100110111111110011000000000" then --2 sec
+					led1 = '0';
+					led2 = '0';
+					led3 = '0';
+					led4 = '1';
+					
+					rst <= '1';
+					state <= s2;
+					end if;
+				when s2
+					rst <= '0';
+					
+					led1 <= '0';
+					led2 <= '0';
+					led3 <= '0';
+					led4 <= '0';
+					led5 <= '1';
+					
+					if  counter < "100000001011111011111100000000" then -- 5 sec
+						if debcounter = "1100110111111110011000000"  then -- .25 sec
+							if b3 = '0' then
+								
+								debcounter <= (others => '0');
+							end if;
+							if b2 = '0' then
+								debcounter <= (others => '0');
+							end if;
+							if b4 = '0' then
+								debcounter <= (others => '0');
+								state <= lit3;
+						else 
+							debcounter <= (others => '0');
+							
+						end if;
+					else
+						state <= fail;
+					end if;
+				when lit3
+					rst <= '0';
+					led5 = '0';
+					if counter = "1000000010111110111111000000000" then --1 sec
+					led1 = '0';
+					led2 = '1';
+					led3 = '0';
+					led4 = '0';
+					end if;
+					if counter = "1001101001111110110010000000" then -- 1.5 sec
+					led1 = '0';
+					led2 = '0';
+					led3 = '0';
+					led4 = '1';
+					end if;
+					if counter = "1100110111111110011000000000" then --2 sec
+					led1 = '0';
+					led2 = '1';
+					led3 = '0';
+					led4 = '0';
+					if counter = "10000000101111101111110000000" then --2.5 sec
+					led1 = '1';
+					led2 = '0';
+					led3 = '0';
+					led4 = '0';
+					
+					rst <= '1';
+					state <= s3;
+					end if;
+				when s3
+					rst <= '0';
+					
+					led1 <= '0';
+					led2 <= '0';
+					led3 <= '0';
+					led4 <= '0';
+					led5 <= '1';
+					
+					if  counter < "100000001011111011111100000000" then -- 5 sec
+						if debcounter = "1100110111111110011000000"  then -- .25 sec
+							if b2 = '0' then
+								
+								debcounter <= (others => '0');
+							end if;
+							if b4 = '0' then
+								debcounter <= (others => '0');
+							end if;
+							if b2 = '0' then
+								debcounter <= (others => '0');
+								end if;
+							if b1 = '0' then
+								debcounter <= (others => '0');
+								state <= pass;
+						else 
+							debcounter <= (others => '0');
+							
+						end if;
+					else
+						state <= fail;
+					end if;
+					
+					
+				when waitt =>
+					if enable = '1' then
+						state <= start;
+					end if;
+				when pass => 
+					success => '1';
+				when fail =>
+					fl = '1';
+			end case;
+		end if;
+	end simon;
+end behavior;

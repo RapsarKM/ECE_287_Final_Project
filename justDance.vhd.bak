@@ -1,0 +1,237 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_unsigned.all;
+use IEEE.std_logic_arith.all;
+
+entity justDance is
+	port(
+		ps2_clk      : IN  STD_LOGIC;                     --clock signal from PS/2 keyboard
+		ps2_data     : IN  STD_LOGIC;                     --data signal from PS/2 keyboard
+		clk	:	in STD_LOGIC;
+		clr	:	in STD_LOGIC;
+		rand	:	in STD_LOGIC_VECTOR(7 downto 0);
+		U	:	out STD_LOGIC;
+		D	:	out STD_LOGIC;
+		L	:	out STD_LOGIC;
+		R	:	out STD_LOGIC;
+		fl	:	out STD_LOGIC;
+		sc	:	out STD_LOGIC;
+	);
+end justDance;
+
+architecture justDance is
+	type state_type is(start, up, down, leftt, rightt,fail, pass);
+	signal state: state_type; 
+	signal keyin : std_logic_vector(7 downto 0);
+	signal rnd : std_logic_vector(7 downto 0) := rand;
+	signal success : std_logic_vector(2 downto 0) := "000";
+	signal keyin : std_LOGIC_VECTOR(7 downto 0) := ps2_code;
+	signal UU : std_LOGIC := U;
+	signal DD : std_LOGIC := D;
+	signal LL : std_LOGIC := L;
+	signal RR : std_LOGIC := R;
+	
+BEGIN
+
+	keyboard: entity work.ps2_keyboard
+		GENERIC map(
+			clk_freq              => 108_000_000, --system clock frequency in Hz
+			debounce_counter_size => 9)         --set such that (2^size)/clk_freq = 5us (size = 8 for 50MHz)
+		PORT map(
+			clk          => clk,                     --system clock
+			ps2_clk      => ps2_clk,                   --clock signal from PS/2 keyboard
+			ps2_data     => ps2_data,                     --data signal from PS/2 keyboard
+			ps2_code_new => ps2_code_new,                    --flag that new PS/2 code is available on ps2_code bus
+			ps2_code     => ps2_code --code received from PS/2
+			);
+	
+	w: entity work.Pixel_On_Text
+        generic map (
+        	textLength => 2
+        )
+        port map(
+        	clk => clk,
+        	displayText => "UP",
+        	position => (50, 50), -- text position (top left)
+        	horzCoord => row,
+        	vertCoord => column,
+        	pixel => UU -- result
+        );
+	s: entity work.Pixel_On_Text
+        generic map (
+        	textLength => 4
+        )
+        port map(
+        	clk => clk,
+        	displayText => "DOWN",
+        	position => (50, 50), -- text position (top left)
+        	horzCoord => row,
+        	vertCoord => column,
+        	pixel => DD -- result
+        );
+	a: entity work.Pixel_On_Text
+        generic map (
+        	textLength => 4
+        )
+        port map(
+        	clk => clk,
+        	displayText => "LEFT",
+        	position => (50, 50), -- text position (top left)
+        	horzCoord => row,
+        	vertCoord => column,
+        	pixel => LL -- result
+        );
+		  
+	d: entity work.Pixel_On_Text
+        generic map (
+        	textLength => 5
+        )
+        port map(
+        	clk => clk,
+        	displayText => "RIGHT",
+        	position => (50, 50), -- text position (top left)
+        	horzCoord => row,
+        	vertCoord => column,
+        	pixel => RR -- result
+        );
+	
+	
+	sDance: process(clk,clr)  --state machine for just dance module
+	begin
+		if(clr = '1') then
+			state <= start;
+		
+		elsif (clk'event and clk = '1') then
+		case state is
+			when start =>
+				if keyin = X"5A" then
+					if (rnd(0) = '1') then
+						-- print up
+						state <= up;
+						U = '1';
+					elsif (rnd(1) = '1') then
+						-- print down
+						state <= down;
+						D <= '1';
+					elsif (rnd(2) = '1') then
+						-- print left
+						state <= leftt;
+						L <= '1';
+					else
+						-- print right
+						state <= rightt;
+						R <= '1';
+					end if;
+				end if;
+			when up =>
+				if keyin = X"1D" then
+					success <= success + '1';
+					if success = "111" then
+						state <= pass;
+					end if;
+					if (rnd(0) = '1') then
+						-- print up
+						state <= up;
+						U = '1';
+					elsif (rnd(1) = '1') then
+						-- print down
+						state <= down;
+						D <= '1';
+					elsif (rnd(2) = '1') then
+						-- print left
+						state <= leftt;
+						L <= '1';
+					else
+						-- print right
+						state <= rightt;
+						R <= '1';
+					end if;
+				else
+					state <= fail;
+				end if;
+			when down =>
+				if keyin = X"1B" then
+					success <= success + '1';
+					if success = "111" then
+						state <= pass;
+					end if;
+					if (rnd(0) = '1') then
+						-- print up
+						state <= up;
+						U = '1';
+					elsif (rnd(1) = '1') then
+						-- print down
+						state <= down;
+						D <= '1';
+					elsif (rnd(2) = '1') then
+						-- print left
+						state <= leftt;
+						L <= '1';
+					else
+						-- print right
+						state <= rightt;
+						R <= '1';
+					end if;
+				else
+					state <= fail;
+				end if;
+			when leftt =>
+				if keyin = X"1C" then
+					success <= success + '1';
+					if success = "111" then
+						state <= pass;
+					end if;
+					if (rnd(0) = '1') then
+						-- print up
+						state <= up;
+						U = '1';
+					elsif (rnd(1) = '1') then
+						-- print down
+						state <= down;
+						D <= '1';
+					elsif (rnd(2) = '1') then
+						-- print left
+						state <= leftt;
+						L <= '1';
+					else
+						-- print right
+						state <= rightt;
+						R <= '1';
+					end if;
+				else
+					state <= fail;
+				end if;
+			when rightt =>
+				if keyin = X"23" then
+					success <= success + '1';
+					if success = "111" then
+						state <= pass;
+					end if;
+					if (rnd(0) = '1') then
+						-- print up
+						state <= up;
+						U = '1';
+					elsif (rnd(1) = '1') then
+						-- print down
+						state <= down;
+						D <= '1';
+					elsif (rnd(2) = '1') then
+						-- print left
+						state <= leftt;
+						L <= '1';
+					else
+						-- print right
+						state <= rightt;
+						R <= '1';
+					end if;
+				else
+					state <= fail;
+				end if;
+			when fail =>
+				fl = '1';
+			when pass =>
+				sc = '1';
+		end case;
+		end if;
+	end process sDance;
+end justDance;

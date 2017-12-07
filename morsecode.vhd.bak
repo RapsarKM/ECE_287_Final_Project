@@ -1,0 +1,656 @@
+libray ieee;
+USE ieee.std_logic_unsigned.all;
+USE ieee.std_logic_1164.all;
+USE ieee.numeric_std.all;
+
+entity morsecode is
+	port(
+		en		: in std_logic;
+		rand		: in std_logic_vector(7 downto 0);
+		clk		: in std_logic;
+		led		: in std_logic;
+		ps2_clk		: in std_logic;
+		ps2_data	: in std_logic;
+		
+		success		: out std_logic;
+		boom		: out std_logic);
+end morsecode;
+
+architecture behaviour of morsecode is
+
+	signal counter 	: std_logic_vector(32 downto 0);
+	signal randNum 	: std_logic_vector(7 downto 0);
+	signal letter1	: std_logic_vector(7 downto 0);
+	signal letter2	: std_logic_vector(7 downto 0);
+	signal letter3	: std_logic_vector(7 downto 0);
+	signal letter4	: std_logic_vector(7 downto 0);
+	signal letter5	: std_logic_vector(7 downto 0);
+
+	type state_type is (off, start, code1, code2, code3, code4, code5, code6, code7, code8);
+	signal state : state_type;
+	
+	blink: process(clk)
+	begin
+		if clk'event and clk = '1' and en ='1' then
+			case state is
+				when code1 =>
+					--shell ... .... . ._.. ._..
+				-- .
+					led <= '1'; 
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				when code2 =>
+				-- halls .... ._ ._.. ._.. ...
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				when code3 =>
+				--slick ... ._.. .. _._. _._
+				-- .
+					led <= '1'; 
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				when code4 =>
+				-- trick _ ._. .. _._. _._
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				when code5 =>
+				-- boxes _... ___ _.._ . ...
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+ 				-- _
+					led <= '1' ;
+					wait for 500 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- .
+					led <= '1' ;
+					wait for 250 ms;
+					led <= '0';
+					wait for 250 ms;
+				-- wait letter
+					wait for 500 ms;
+				when case6 =>
+				--leaks ._.. . ._ _._ ...
+		end if;				
+	end process;
+
+	process(clk)
+	begin
+
+		if en = '0' then
+			randNum <= rand;
+			sate <= off;
+		elsif clk'event and clk ='1' then
+			case state is
+				when off =>
+					state <= start;
+				when start =>
+					if randNum < "00010000" then
+						state <= code1;
+					elsif randnum < "00100000" then
+						state <= code2;
+					elsif randnum < "00110000" then
+						state <= code3;
+					elsif randnum < "01000000" then
+						state <= code4;
+					elsif randnum < "01010000" then
+						state <= code5;
+					elsif randnum < "01100000" then
+						state <= code6;
+					elsif randnum < "01110000" then
+						state <= code7;
+					else 
+						state <= code8;
+					endif;
+				when code1 =>
+				--shell ... .... . ._.. ._..
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"1B" and letter4 = X"33" and letter3 = X"24" and letter2 = X"4B" and letter1 = X"4B" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;
+				end if;
+				when code2 =>
+				-- halls .... ._ ._.. ._.. ...
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"33" and letter4 = X"1C" and letter3 = "4B" and letter2 = "4B" and letter1 = "1B" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;
+				end if;
+
+				when code3 =>
+				-- slick
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"1B" and letter4 = X"4B" and letter3 = "43" and letter2 = "21" and letter1 = "42" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;
+				end if;
+
+				when code4 =>
+				-- trick
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"2C" and letter4 = X"2D" and letter3 = "43" and letter2 = "21" and letter1 = "42" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;
+				end if;
+
+				when code5 =>
+				-- boxes
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"32" and letter4 = X"44" and letter3 = "22" and letter2 = "24" and letter1 = "1B" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;	
+				end if;
+
+				when code6 =>
+				-- leaks
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"4B" and letter4 = X"24" and letter3 = "1C" and letter2 = "42" and letter1 = "1B" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;
+				end if;
+
+				when code7 =>
+				-- flick
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"2B" and letter4 = X"4B" and letter3 = "43" and letter2 = "21" and letter1 = "42" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;	
+				end if;
+
+				when code8 =>
+				-- bombs
+				if  ps2_code_new = '1' then
+					if ps2_code = X"5A" then
+						if letter5 = X"32" and letter4 = X"44" and letter3 = "3A" and letter2 = "32" and letter1 = "1B" then
+							success <= '1';
+						else
+							boom <= '1';
+						end if;
+					else 
+						letter5 <= letter4;
+						letter4 <= letter3;
+						letter3 <= letter2;
+						letter2 <= letter1;
+						letter1 <= ps2_code;
+					end if;
+					wait for 200 ms;										
+				end if;
+		end if;
+	end process;
